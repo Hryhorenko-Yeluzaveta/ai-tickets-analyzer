@@ -6,7 +6,7 @@
 <div class="container">
     <div class="d-flex justify-content-between align-items-center mb-4">
         <h2>Ticket List</h2>
-        <a href="{% url "add_ticket" %}" class="btn btn-dark">
+        <a href="{% url 'add_ticket' %}" class="btn btn-dark">
             + New Ticket
         </a>
     </div>
@@ -35,9 +35,9 @@
                     <td>{{ ticket.category }}</td>
 
                     <td>
-                        {% if ticket.sentiment == 'Positive' %}
+                        {% if ticket.sentiment == 'POS' %}
                             <span class="badge bg-success text-white">Positive</span>
-                        {% elif ticket.sentiment == 'Negative' %}
+                        {% elif ticket.sentiment == 'NEG' %}
                             <span class="badge bg-danger text-white">Negative</span>
                         {% else %}
                             <span class="badge bg-secondary text-white">Neutral</span>
@@ -45,9 +45,9 @@
                     </td>
 
                     <td>
-                        {% if ticket.urgency == 'High' %}
+                        {% if ticket.urgency == 'H' %}
                             <span class="badge bg-danger text-white">High</span>
-                        {% elif ticket.urgency == 'Medium' %}
+                        {% elif ticket.urgency == 'M' %}
                             <span class="badge bg-warning text-dark">Medium</span>
                         {% else %}
                             <span class="badge bg-info text-dark">Low</span>
@@ -55,12 +55,14 @@
                     </td>
 
                     <td class="text-end">
-                        {% if ticket.status == 'Done' %}
+                        {% if ticket.status == 'D' %}
                             <span class="badge bg-success-subtle text-success border border-success">Done</span>
-                        {% elif ticket.status == 'In Progress' %}
-                            <span class="badge bg-warning-subtle text-warning border border-warning">In Progress</span>
+                        {% elif ticket.status == 'P' %}
+                            <span class="badge bg-primary-subtle text-primary border border-primary">In Progress</span>
+                        {% elif ticket.status == 'R' %}
+                            <span class="badge bg-danger-subtle text-danger border border-danger">Rejected</span>
                         {% else %}
-                            <span class="badge bg-light text-dark border">New</span>
+                            <span class="badge bg-light text-dark border border-secondary-subtle">New</span>
                         {% endif %}
                     </td>
                 </tr>
