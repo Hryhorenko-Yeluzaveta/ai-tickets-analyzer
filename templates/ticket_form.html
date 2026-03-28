@@ -8,27 +8,17 @@
         <div class="col-md-6">
             <h1 class="mb-4 text-center">What happened?</h1>
 
-            <form method="POST" action="">
+            <form method="POST">
                 {% csrf_token %}
 
                 <div class="mb-3">
                     <label for="userEmail" class="form-label fw-semibold">Email address</label>
-                    <input type="email"
-                           class="form-control bg-white border-0 shadow-sm py-2"
-                           id="userEmail"
-                           name="user_email"
-                           placeholder="your.email@example.com"
-                           required>
+                    {{ form.author_email }}
                 </div>
 
                 <div class="mb-4">
                     <label for="ticketText" class="form-label fw-semibold">Message</label>
-                    <textarea class="form-control bg-white border-0 shadow-sm"
-                              id="ticketText"
-                              name="ticket_text"
-                              rows="8"
-                              placeholder="Describe the issue you're facing..."
-                              required></textarea>
+                    {{ form.message }}
                 </div>
 
                 <button type="submit" class="btn btn-dark w-100 py-2">

@@ -27,8 +27,13 @@
                 {% for ticket in tickets %}
                 <tr>
                     <td class="fw-bold">{{ ticket.id }}</td>
+                    <td>
+                        <a href="{% url 'ticket' pk=ticket.pk %}" class="link-dark">
+                            {{ ticket.author_email }}
+                        </a>
+                    </td>
                     <td>{{ ticket.category }}</td>
-                    
+
                     <td>
                         {% if ticket.sentiment == 'Positive' %}
                             <span class="badge bg-success text-white">Positive</span>
@@ -49,7 +54,7 @@
                         {% endif %}
                     </td>
 
-                    <td>
+                    <td class="text-end">
                         {% if ticket.status == 'Done' %}
                             <span class="badge bg-success-subtle text-success border border-success">Done</span>
                         {% elif ticket.status == 'In Progress' %}
@@ -57,12 +62,6 @@
                         {% else %}
                             <span class="badge bg-light text-dark border">New</span>
                         {% endif %}
-                    </td>
-
-                    <td class="text-end">
-                        <a href="/analyzer/ticket/{{ ticket.id }}" class="btn btn-sm btn-outline-dark">
-                            View Details
-                        </a>
                     </td>
                 </tr>
                 {% empty %}
