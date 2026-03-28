@@ -16,6 +16,7 @@ class TicketListView(ListView):
     template_name = 'tickets_list.html'
     model = Ticket
     context_object_name = 'tickets'
+    paginate_by = 2
 
 class TicketDetailView(DetailView):
     template_name = 'ticket_detail.html'
