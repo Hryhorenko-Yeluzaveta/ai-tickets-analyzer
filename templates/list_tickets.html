@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+
+{% block title %}All Tickets{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Ticket List</h2>
+        <a href="{% url "add_ticket" %}" class="btn btn-dark">
+            + New Ticket
+        </a>
+    </div>
+
+    <div class="table-responsive shadow-sm rounded">
+        <table class="table table-hover bg-white mb-0 align-middle">
+            <thead class="table-light">
+                <tr>
+                    <th scope="col">#</th>
+                    <th scope="col">User Email</th>
+                    <th scope="col">Category</th>
+                    <th scope="col">Sentiment</th>
+                    <th scope="col">Urgency</th>
+                    <th scope="col" class="text-end">Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ticket in tickets %}
+                <tr>
+                    <td class="fw-bold">{{ ticket.id }}</td>
+                    <td>{{ ticket.category }}</td>
+                    
+                    <td>
+                        {% if ticket.sentiment == 'Positive' %}
+                            <span class="badge bg-success text-white">Positive</span>
+                        {% elif ticket.sentiment == 'Negative' %}
+                            <span class="badge bg-danger text-white">Negative</span>
+                        {% else %}
+                            <span class="badge bg-secondary text-white">Neutral</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% if ticket.urgency == 'High' %}
+                            <span class="badge bg-danger text-white">High</span>
+                        {% elif ticket.urgency == 'Medium' %}
+                            <span class="badge bg-warning text-dark">Medium</span>
+                        {% else %}
+                            <span class="badge bg-info text-dark">Low</span>
+                        {% endif %}
+                    </td>
+
+                    <td>
+                        {% if ticket.status == 'Done' %}
+                            <span class="badge bg-success-subtle text-success border border-success">Done</span>
+                        {% elif ticket.status == 'In Progress' %}
+                            <span class="badge bg-warning-subtle text-warning border border-warning">In Progress</span>
+                        {% else %}
+                            <span class="badge bg-light text-dark border">New</span>
+                        {% endif %}
+                    </td>
+
+                    <td class="text-end">
+                        <a href="/analyzer/ticket/{{ ticket.id }}" class="btn btn-sm btn-outline-dark">
+                            View Details
+                        </a>
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="6" class="text-center py-5 text-muted">
+                        <p class="mb-0">No tickets found.</p>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
