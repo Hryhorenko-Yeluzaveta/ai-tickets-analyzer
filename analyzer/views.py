@@ -6,7 +6,7 @@ from django.http import HttpResponseRedirect, HttpResponseBadRequest
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.views.decorators.http import require_POST
-from django.views.generic import CreateView, ListView, DetailView
+from django.views.generic import CreateView, ListView, DetailView, DeleteView
 
 from analyzer.forms import TicketCreateForm
 from analyzer.models import Ticket
@@ -54,7 +54,6 @@ class TicketCreateView(CreateView):
 
         return HttpResponseRedirect(self.get_success_url())
 
-
 class TicketListView(ListView):
     template_name = 'tickets_list.html'
     model = Ticket
@@ -65,6 +64,10 @@ class TicketDetailView(DetailView):
     template_name = 'ticket_detail.html'
     model = Ticket
     context_object_name = 'ticket'
+
+class TicketDeleteView(DeleteView):
+    model = Ticket
+    success_url = reverse_lazy('list_tickets')
 
 @require_POST
 def change_status(request, ticket_id, new_status):
