@@ -11,6 +11,37 @@
         </a>
     </div>
 
+    <div class="bg-white p-3 rounded shadow-sm mb-4">
+        <form method="GET" class="row g-2 align-items-center">
+            <div class="col-auto">
+                <span class="fw-medium text-muted pe-2">Filter by:</span>
+            </div>
+
+            <div class="col-12 col-md-3">
+                <select name="urgency" class="form-select">
+                    <option value="">All Urgencies</option>
+                    {% for urgency_value, urgency_label in urgency_choices.items %}
+                        <option value="{{ urgency_value }}" {% if request.GET.urgency == urgency_value %}selected{% endif %}>{{ urgency_label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-12 col-md-3">
+                <select name="status" class="form-select">
+                    <option value="">All Statuses</option>
+                    {% for status_value, status_label in status_choices.items %}
+                        <option value="{{ status_value }}" {% if request.GET.status == status_value %}selected{% endif %}>{{ status_label }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="col-auto">
+                <button type="submit" class="btn btn-dark">Apply Filters</button>
+                <a href="{% url 'list_tickets' %}" class="btn btn-outline-secondary">Clear</a>
+            </div>
+        </form>
+    </div>
+
     <div class="table-responsive shadow-sm rounded">
         <table class="table table-hover bg-white mb-0 align-middle">
             <thead class="table-light">

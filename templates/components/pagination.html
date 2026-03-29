@@ -4,7 +4,7 @@
 
         {% if page_obj.has_previous %}
             <li class="page-item">
-                <a class="page-link text-dark border-0" href="?page={{ page_obj.previous_page_number }}">&laquo; Prev</a>
+                <a class="page-link text-dark border-0" href="?urgency={{ request.GET.urgency }}&status={{ request.GET.status }}&page={{ page_obj.previous_page_number }}">&laquo; Prev</a>
             </li>
         {% else %}
             <li class="page-item disabled">
@@ -19,14 +19,14 @@
                 </li>
             {% else %}
                 <li class="page-item">
-                    <a class="page-link text-dark border-0" href="?page={{ num }}">{{ num }}</a>
+                    <a class="page-link text-dark border-0" href="?urgency={{ request.GET.urgency }}&status={{ request.GET.status }}&page={{ num }}">{{ num }}</a>
                 </li>
             {% endif %}
         {% endfor %}
 
         {% if page_obj.has_next %}
             <li class="page-item">
-                <a class="page-link text-dark border-0" href="?page={{ page_obj.next_page_number }}">Next &raquo;</a>
+                <a class="page-link text-dark border-0" href="?urgency={{ request.GET.urgency }}&status={{ request.GET.status }}&page={{ page_obj.next_page_number }}">Next &raquo;</a>
             </li>
         {% else %}
             <li class="page-item disabled">

@@ -75,8 +75,26 @@ class TicketCreateView(CreateView):
 class TicketListView(ListView):
     template_name = 'tickets_list.html'
     model = Ticket
-    context_object_name = 'tickets'
     paginate_by = 10
+    context_object_name = 'tickets'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        urgency_filter = self.request.GET.get('urgency')
+        if urgency_filter:
+            queryset = queryset.filter(urgency = urgency_filter)
+
+        status_filter = self.request.GET.get('status')
+        if status_filter:
+            queryset = queryset.filter(status = status_filter)
+        return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['urgency_choices'] = Ticket.URGENCY_CHOICES
+        context['status_choices'] = Ticket.STATUS_CHOICES
+        return context
+
 
 class TicketDetailView(DetailView):
     template_name = 'ticket_detail.html'
