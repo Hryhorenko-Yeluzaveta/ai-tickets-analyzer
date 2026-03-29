@@ -2,6 +2,8 @@ import json
 import os
 from http.client import responses
 
+from django.contrib import messages
+from django.contrib.messages.views import SuccessMessageMixin
 from django.http import HttpResponseRedirect, HttpResponseBadRequest
 from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy, reverse
@@ -29,7 +31,7 @@ class TicketCreateView(CreateView):
             Act as Technical Support Tickets Analyzer.
             The user sends his email address along with the request.
             Analyze this client request: "{self.object.message}"
-            Add necessary Category,
+            Add necessary Category (in one word. if it some kind of nonsense - write Spam),
             Sentiment (must be exactly one of: POS (positive), NEG (negative), NEU (neutral)),
             Urgency (must be exactly one of: H (high), M (medium), L (low))
             and your suggested response for this request. Don't say you've already done something, just provide a recommendation.
@@ -52,6 +54,8 @@ class TicketCreateView(CreateView):
         self.object.ai_response = ai_response['suggested_response']
         self.object.save()
 
+        messages.success(self.request, 'Your ticket has been successfully analyzed and registered!')
+
         return HttpResponseRedirect(self.get_success_url())
 
 class TicketListView(ListView):
@@ -69,6 +73,12 @@ class TicketDeleteView(DeleteView):
     model = Ticket
     success_url = reverse_lazy('list_tickets')
 
+    def form_valid(self, form):
+        success_url = self.get_success_url()
+        self.object.delete()
+        messages.success(self.request, 'Your ticket has been successfully deleted!')
+        return HttpResponseRedirect(success_url)
+
 @require_POST
 def change_status(request, ticket_id, new_status):
     ticket = get_object_or_404(Ticket, pk=ticket_id)
@@ -77,6 +87,14 @@ def change_status(request, ticket_id, new_status):
     if new_status not in valid_statuses:
         return HttpResponseBadRequest("Invalid status code.")
 
+    if new_status == 'P':
+        messages.info(request, 'The ticket has been accepted for processing.')
+
+    if new_status == 'R':
+        messages.error(request, 'The ticket has been rejected.')
+
+    if new_status == 'D':
+        messages.success(request, 'The ticket has been marked as done.')
 
     ticket.status = new_status
     ticket.save()
