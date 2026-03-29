@@ -9,6 +9,7 @@ from django.shortcuts import render, get_object_or_404
 from django.urls import reverse_lazy, reverse
 from django.views.decorators.http import require_POST
 from django.views.generic import CreateView, ListView, DetailView, DeleteView
+from google.genai.errors import APIError
 
 from analyzer.forms import TicketCreateForm
 from analyzer.models import Ticket
@@ -25,36 +26,49 @@ class TicketCreateView(CreateView):
 
     def form_valid(self, form):
         self.object = form.save(commit=False)
-        client = genai.Client(api_key=os.getenv('GEMINI_API_KEY'))
+        ai_success = False
+        try:
+            client = genai.Client(api_key=os.getenv('GEMINI_API_KEY'))
 
-        prompt = f"""
-            Act as Technical Support Tickets Analyzer.
-            The user sends his email address along with the request.
-            Analyze this client request: "{self.object.message}"
-            Add necessary Category (in one word. if it some kind of nonsense - write Spam),
-            Sentiment (must be exactly one of: POS (positive), NEG (negative), NEU (neutral)),
-            Urgency (must be exactly one of: H (high), M (medium), L (low))
-            and your suggested response for this request. Don't say you've already done something, just provide a recommendation.
-            All response data give in JSON-format with keys: "category", "sentiment", "urgency", "suggested_response".
-        """
-        response = client.models.generate_content(
-            model = 'gemini-3.1-flash-lite-preview',
-            contents = prompt,
-            config = types.GenerateContentConfig(
-                response_mime_type='application/json',
-                thinking_config = types.ThinkingConfig(thinking_level = "low"),
-                temperature=1.0
-            ),
-        )
+            prompt = f"""
+                Act as Technical Support Tickets Analyzer.
+                The user sends his email address along with the request.
+                Analyze this client request: "{self.object.message}"
+                Add necessary Category (in one word. if it some kind of nonsense - write Spam),
+                Sentiment (must be exactly one of: POS (positive), NEG (negative), NEU (neutral)),
+                Urgency (must be exactly one of: H (high), M (medium), L (low))
+                and your suggested response for this request. Don't say you've already done something, just provide a recommendation.
+                All response data give in JSON-format with keys: "category", "sentiment", "urgency", "suggested_response".
+            """
+            response = client.models.generate_content(
+                model = 'gemini-3.1-flash-lite-preview',
+                contents = prompt,
+                config = types.GenerateContentConfig(
+                    response_mime_type='application/json',
+                    thinking_config = types.ThinkingConfig(thinking_level = "low"),
+                    temperature=1.0
+                ),
+            )
 
-        ai_response = json.loads(response.text)
-        self.object.category = ai_response['category']
-        self.object.urgency = ai_response['urgency']
-        self.object.sentiment = ai_response['sentiment']
-        self.object.ai_response = ai_response['suggested_response']
+            ai_response = json.loads(response.text)
+            self.object.category = ai_response.get('category')
+            self.object.urgency = ai_response.get('urgency')
+            self.object.sentiment = ai_response.get('sentiment')
+            self.object.ai_response = ai_response.get('suggested_response')
+            ai_success = True
+
+        except APIError as e:
+            print(f"Error API: {e}")
+        except json.JSONDecodeError as e:
+            print(f"Failed to parse JSON: {e}")
+        except Exception as e:
+            print(f"Unexpected error: {e}")
+
         self.object.save()
-
-        messages.success(self.request, 'Your ticket has been successfully analyzed and registered!')
+        if ai_success:
+            messages.success(self.request, 'Your ticket has been successfully created and analyzed!')
+        else:
+            messages.warning(self.request, 'Ticket created successfully, but AI analysis is temporarily unavailable.')
 
         return HttpResponseRedirect(self.get_success_url())
 
